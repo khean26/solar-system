@@ -1,0 +1,1388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Cosmic Journey • Stars • Constellations • Galaxies • Expeditions</title>
+<style>
+  :root {
+    --accent: #ffd700;
+    --text: #f0f8ff;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: system-ui, -apple-system, sans-serif;
+    background: #000;
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+  }
+  /* ─── Background ──────────────────────────────────────── */
+  #space {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+  }
+  .star {
+    position: absolute;
+    background: white;
+    border-radius: 50%;
+    opacity: 0.7;
+    animation: twinkle 3s infinite alternate ease-in-out;
+    will-change: opacity, transform;
+  }
+  .meteor {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    background: linear-gradient(white, transparent);
+    border-radius: 50%;
+    box-shadow: 0 0 12px 4px #fff8;
+    transform: translateX(-100vw) translateY(-100vh) rotate(45deg);
+    animation: meteor linear infinite;
+    will-change: transform, opacity;
+  }
+  @keyframes twinkle {
+    0%,100% { opacity: 0.4; transform: scale(0.8); }
+    50% { opacity: 1; transform: scale(1.15); }
+  }
+  @keyframes meteor {
+    0% { transform: translateX(-20vw) translateY(-20vh) rotate(45deg); opacity: 0; }
+    10% { opacity: 1; }
+    100% { transform: translateX(120vw) translateY(120vh) rotate(45deg); opacity: 0; }
+  }
+  /* ─── UI ──────────────────────────────────────────────── */
+  nav {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    background: rgba(0,0,0,0.65);
+    backdrop-filter: blur(10px);
+    z-index: 100;
+    padding: 1rem 0;
+  }
+  nav ul {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    list-style: none;
+  }
+  nav a {
+    color: var(--text);
+    text-decoration: none;
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+    border-radius: 2rem;
+    transition: all 0.3s ease;
+  }
+  nav a:hover, nav a.active {
+    background: rgba(255,215,0,0.25);
+    color: var(--accent);
+  }
+  main {
+    position: relative;
+    z-index: 10;
+    padding: 7rem 1.5rem 4rem;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  h1, h2 {
+    text-align: center;
+    margin-bottom: 1.2rem;
+    text-shadow: 0 0 20px rgba(255,215,0,0.6);
+    animation: pulse-glow 4s infinite alternate ease-in-out;
+  }
+  @keyframes pulse-glow {
+    0% { text-shadow: 0 0 10px rgba(255,215,0,0.4); }
+    100% { text-shadow: 0 0 30px rgba(255,215,0,0.9); }
+  }
+  .page { display: none; }
+  .page.active { display: block; }
+  .fact {
+    font-style: italic;
+    text-align: center;
+    margin: 2rem 0;
+    padding: 1.2rem;
+    background: rgba(255,255,255,0.05);
+    border-radius: 12px;
+    border: 1px solid rgba(255,215,0,0.2);
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  .fact:hover { transform: scale(1.03); background: rgba(255,215,0,0.1); }
+  .interactive {
+    color: var(--accent);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    padding: 0.5rem;
+    border-radius: 8px;
+  }
+  .interactive:hover { transform: scale(1.08); background: rgba(255,215,0,0.15); }
+  button {
+    background: rgba(255,215,0,0.9);
+    color: #000;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    margin: 0.4rem;
+    border-radius: 2rem;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s;
+  }
+  button:hover { background: #ffea70; transform: translateY(-1px); }
+  canvas {
+    display: block;
+    margin: 2rem auto;
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 12px;
+    background: rgba(0,0,0,0.3);
+    touch-action: none;
+  }
+
+  /* ─── ENHANCED HOME PAGE ──────────────────────────────────────── */
+  #home .hero {
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+  #home .hero h1 {
+    font-size: 4.2rem;
+    margin-bottom: 0.5rem;
+    animation: pulse-glow 3s infinite alternate;
+  }
+  #home .hero p {
+    font-size: 1.35rem;
+    opacity: 0.95;
+    max-width: 620px;
+    margin: 0 auto 2rem;
+  }
+  .home-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1.4rem;
+    margin: 2.5rem 0;
+  }
+  .home-card {
+    background: rgba(255,255,255,0.06);
+    border: 2px solid rgba(255,215,0,0.25);
+    border-radius: 18px;
+    padding: 1.8rem 1rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+    overflow: hidden;
+  }
+  .home-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 50% 20%, rgba(255,215,0,0.15), transparent);
+    opacity: 0;
+    transition: opacity 0.4s;
+  }
+  .home-card:hover::before {
+    opacity: 1;
+  }
+  .home-card:hover {
+    transform: translateY(-14px) scale(1.07);
+    border-color: var(--accent);
+    box-shadow: 0 0 30px rgba(255,215,0,0.5);
+  }
+  .home-card span {
+    font-size: 3.8rem;
+    display: block;
+    margin-bottom: 0.8rem;
+    transition: transform 0.4s;
+  }
+  .home-card:hover span {
+    transform: scale(1.2) rotate(8deg);
+  }
+  .home-card strong {
+    font-size: 1.1rem;
+    display: block;
+  }
+
+  /* Gallery & Lightbox, Modal, Solar Controls, Fact Cards */
+  .gallery { display: flex; flex-wrap: wrap; justify-content: center; gap: 1rem; margin: 2rem 0; }
+  .gallery img { max-width: 300px; border-radius: 8px; box-shadow: 0 0 15px rgba(255,215,0,0.3); transition: transform 0.3s; cursor: pointer; }
+  .gallery img:hover { transform: scale(1.05); }
+  #lightbox { display: none; position: fixed; z-index: 200; inset: 0; background: rgba(0,0,0,0.9); justify-content: center; align-items: center; }
+  #lightbox-img { max-width: 90%; max-height: 90%; border-radius: 8px; }
+  #info-modal { display: none; position: fixed; z-index: 300; inset: 0; background: rgba(0,0,0,0.95); align-items: center; justify-content: center; }
+  .modal-content { background: #111; max-width: 420px; padding: 2rem; border-radius: 16px; border: 2px solid var(--accent); text-align: center; box-shadow: 0 0 50px rgba(255,215,0,0.7); }
+  .modal-content h3 { color: var(--accent); margin-bottom: 1rem; font-size: 1.6rem; }
+  .modal-content .demo { font-size: 7rem; margin: 1rem 0; animation: pulse-glow 2s infinite alternate; }
+  .close-modal { position: absolute; top: 15px; right: 25px; font-size: 40px; color: #fff; cursor: pointer; }
+  .solar-controls { text-align: center; margin: 1.5rem 0; }
+  input[type="range"] { accent-color: var(--accent); width: 280px; }
+  .fact-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1rem; margin: 2rem 0; }
+  .fact-card { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,215,0,0.3); border-radius: 12px; padding: 1.2rem 0.8rem; text-align: center; cursor: pointer; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+  .fact-card:hover { transform: translateY(-8px) scale(1.04); background: rgba(255,215,0,0.15); border-color: var(--accent); box-shadow: 0 0 20px rgba(255,215,0,0.4); }
+  .fact-card span { font-size: 2.4rem; display: block; margin-bottom: 0.8rem; }
+
+  /* Additional Interactive Styles */
+  .quiz-container { text-align: center; margin: 2rem 0; }
+  .quiz-result { margin-top: 1rem; min-height: 1.5rem; font-weight: 600; }
+  .hover-info { cursor: help; border-bottom: 1px dotted var(--accent); }
+  .hover-info:hover { color: var(--accent); }
+  .flip-card { perspective: 1000px; cursor: pointer; margin: 1rem; width: 200px; height: 200px; display: inline-block; }
+  .flip-card-inner { position: relative; width: 100%; height: 100%; text-align: center; transition: transform 0.6s; transform-style: preserve-3d; }
+  .flip-card:hover .flip-card-inner { transform: rotateY(180deg); }
+  .flip-card-front, .flip-card-back { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 12px; padding: 1rem; }
+  .flip-card-front { background: rgba(255,255,255,0.06); }
+  .flip-card-back { background: rgba(255,215,0,0.15); transform: rotateY(180deg); }
+  .cards-container { display: flex; flex-wrap: wrap; justify-content: center; }
+
+  /* Creative Star Tables */
+  .star-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 0.5rem;
+    margin: 1rem 0;
+  }
+  .star-table th, .star-table td {
+    padding: 0.8rem;
+    text-align: left;
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+  .star-table th {
+    background: rgba(255,215,0,0.25);
+    color: #000;
+    font-weight: 600;
+  }
+  .star-table tr:hover td {
+    background: rgba(255,215,0,0.15);
+    transform: scale(1.02);
+  }
+  .star-table td:first-child {
+    font-weight: bold;
+  }
+  /* Color-coded rows for star types */
+  tr.o-type td { background: rgba(0,0,255,0.1); color: #88ccff; }
+  tr.b-type td { background: rgba(173,216,230,0.1); color: #add8e6; }
+  tr.a-type td { background: rgba(255,255,255,0.1); color: #fff; }
+  tr.f-type td { background: rgba(255,255,224,0.1); color: #ffffe0; }
+  tr.g-type td { background: rgba(255,255,0,0.1); color: #ffff00; }
+  tr.k-type td { background: rgba(255,165,0,0.1); color: #ffa500; }
+  tr.m-type td { background: rgba(255,0,0,0.1); color: #ff6666; }
+  tr.massive td { background: rgba(255,0,0,0.1); }
+  tr.medium td { background: rgba(255,215,0,0.1); }
+  tr.small td { background: rgba(0,255,0,0.1); }
+
+  /* NEW ENHANCEMENTS */
+  #cosmic-score {
+    position: fixed;
+    top: 18px;
+    right: 18px;
+    background: rgba(0,0,0,0.85);
+    color: var(--accent);
+    padding: 10px 22px;
+    border-radius: 50px;
+    border: 3px solid var(--accent);
+    font-size: 1.25rem;
+    font-weight: 700;
+    z-index: 200;
+    box-shadow: 0 0 25px rgba(255,215,0,0.6);
+    transition: all 0.4s;
+  }
+  #cosmic-score:hover { transform: scale(1.08); }
+
+  .star-creator {
+    background: rgba(255,255,255,0.06);
+    padding: 2rem;
+    border-radius: 20px;
+    margin: 2.5rem 0;
+    text-align: center;
+    border: 2px solid rgba(255,215,0,0.3);
+  }
+
+  #galaxy-sim-canvas {
+    box-shadow: 0 0 40px rgba(255,215,0,0.4);
+  }
+
+  .timeline-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 1.2rem;
+  }
+  .timeline-event {
+    background: rgba(255,255,255,0.06);
+    border: 2px solid rgba(255,215,0,0.3);
+    border-radius: 16px;
+    padding: 1.4rem 1rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.4s;
+  }
+  .timeline-event:hover {
+    transform: translateY(-12px) scale(1.06);
+    border-color: var(--accent);
+    box-shadow: 0 0 30px rgba(255,215,0,0.5);
+  }
+</style>
+</head>
+<body>
+<div id="space"></div>
+
+<!-- COSMIC SCORE -->
+<div id="cosmic-score">0 ✨ Cosmic Score</div>
+
+<nav>
+  <ul>
+    <li><a href="#home" class="nav-link active">Home</a></li>
+    <li><a href="#stars" class="nav-link">Stars</a></li>
+    <li><a href="#constellations" class="nav-link">Constellations</a></li>
+    <li><a href="#galaxies" class="nav-link">Galaxies</a></li>
+    <li><a href="#solarsystem" class="nav-link">Solar Systems</a></li>
+    <li><a href="#expeditions" class="nav-link">Human Expeditions</a></li>
+  </ul>
+</nav>
+
+<main>
+  <!-- HOME -->
+  <div id="home" class="page active">
+    <div class="hero">
+      <h1>Cosmic Journey</h1>
+      <p>Embark on an epic voyage through the universe.<br>Click the glowing portals below to begin your adventure!</p>
+    </div>
+
+    <h2 style="margin: 2rem 0 1.2rem; color: var(--accent);">Choose Your Cosmic Destination</h2>
+    <div class="home-grid">
+      <div class="home-card" onclick="navigateTo('stars')"><span>🌟</span><strong>Stars</strong></div>
+      <div class="home-card" onclick="navigateTo('constellations')"><span>🧩</span><strong>Constellations</strong></div>
+      <div class="home-card" onclick="navigateTo('galaxies')"><span>🌌</span><strong>Galaxies</strong></div>
+      <div class="home-card" onclick="navigateTo('solarsystem')"><span>🪐</span><strong>Solar Systems</strong></div>
+      <div class="home-card" onclick="navigateTo('expeditions')"><span>🚀</span><strong>Human Expeditions</strong></div>
+    </div>
+
+    <div class="fact" id="random-fact" style="margin-top: 3rem;">Click for a random space fact →</div>
+    <div class="quiz-container">
+      <p>Quick Home Quiz: How many planets in our Solar System?</p>
+      <button onclick="checkHomeQuiz(8)">8</button>
+      <button onclick="checkHomeQuiz(9)">9</button>
+      <button onclick="checkHomeQuiz(7)">7</button>
+      <div id="home-quiz-result" class="quiz-result"></div>
+    </div>
+  </div>
+
+  <!-- STARS -->
+  <div id="stars" class="page">
+    <h1>Stars</h1>
+    <p>Stars are giant balls of hot plasma undergoing nuclear fusion. <strong>Click any type below!</strong></p>
+    
+    <h2>🌟 What Is a Star?</h2>
+    <p>A star is a massive, glowing sphere of hot plasma held together by gravity. It produces energy through nuclear fusion, usually fusing hydrogen into helium in its core.</p>
+    <p>Our closest star is the Sun.</p>
+    
+    <h2>⭐ How Stars Form</h2>
+    <p>Stars are born inside giant clouds of gas and dust called nebulae.</p>
+    <p>Step-by-step formation:</p>
+    <ol>
+      <li><strong>Nebula (Gas Cloud)</strong>
+        <ul>
+          <li>Mostly hydrogen</li>
+          <li>Gravity pulls gas together</li>
+        </ul>
+      </li>
+      <li><strong>Protostar</strong>
+        <ul>
+          <li>Gas clumps heat up as they collapse</li>
+          <li>Not yet producing fusion</li>
+        </ul>
+      </li>
+      <li><strong>Main Sequence Star</strong>
+        <ul>
+          <li>Core temperature reaches ~10 million °C</li>
+          <li>Nuclear fusion begins</li>
+          <li>Star becomes stable</li>
+        </ul>
+      </li>
+    </ol>
+    <p>A famous stellar nursery is the Orion Nebula.</p>
+    
+    <h2>🌈 Types of Stars (By Color & Temperature)</h2>
+    <p>Stars are classified using the spectral system: O, B, A, F, G, K, M (Hot → Cool). Hover over rows for glow effect, click to learn more!</p>
+    <table class="star-table">
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Color</th>
+          <th>Temperature</th>
+          <th>Example</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="o-type interactive" onclick="showStarTypeInfo('O')"><td>O</td><td>Blue</td><td>30,000°C+</td><td>Very rare, massive</td></tr>
+        <tr class="b-type interactive" onclick="showStarTypeInfo('B')"><td>B</td><td>Blue-white</td><td>10,000–30,000°C</td><td>Very bright</td></tr>
+        <tr class="a-type interactive" onclick="showStarTypeInfo('A')"><td>A</td><td>White</td><td>7,500–10,000°C</td><td>Sirius</td></tr>
+        <tr class="f-type interactive" onclick="showStarTypeInfo('F')"><td>F</td><td>Yellow-white</td><td>6,000–7,500°C</td><td>Procyon</td></tr>
+        <tr class="g-type interactive" onclick="showStarTypeInfo('G')"><td>G</td><td>Yellow</td><td>5,200–6,000°C</td><td>☀ Sun</td></tr>
+        <tr class="k-type interactive" onclick="showStarTypeInfo('K')"><td>K</td><td>Orange</td><td>3,700–5,200°C</td><td>Arcturus</td></tr>
+        <tr class="m-type interactive" onclick="showStarTypeInfo('M')"><td>M</td><td>Red</td><td>&lt;3,700°C</td><td>Most common</td></tr>
+      </tbody>
+    </table>
+
+    <h2>🔬 Interactive Star Classifier</h2>
+    <div class="star-creator">
+      <label style="display:block;margin:1rem 0;font-size:1.1rem;">Temperature (K): <input type="range" id="temp-slider" min="2500" max="40000" value="5800" step="100" style="width:70%"></label>
+      <span id="temp-val" style="font-size:1.3rem;color:var(--accent)">5800 K</span>
+      
+      <label style="display:block;margin:1.5rem 0;font-size:1.1rem;">Mass (Solar masses): <input type="range" id="mass-slider" min="0.08" max="150" value="1" step="0.1" style="width:70%"></label>
+      <span id="mass-val" style="font-size:1.3rem;color:var(--accent)">1.0 M☉</span>
+      
+      <div id="classified-star" style="font-size:8rem;margin:2rem 0;transition:all .6s;">☀️</div>
+      <p id="star-class" style="font-size:1.8rem;color:var(--accent);font-weight:700;">G-Type Yellow Dwarf</p>
+    </div>
+
+    <h2>🔥 Types of Stars (By Size & Evolution)</h2>
+    <p><strong>🌞 Main Sequence Stars</strong></p>
+    <ul>
+      <li>Stable fusion phase</li>
+      <li>90% of stars</li>
+      <li>Example: the Sun</li>
+    </ul>
+    <p><strong>🔴 Red Giants</strong></p>
+    <ul>
+      <li>Form when hydrogen runs out</li>
+      <li>Expand massively</li>
+      <li>Example: Betelgeuse</li>
+    </ul>
+    <p><strong>⚪ White Dwarfs</strong></p>
+    <ul>
+      <li>Small, dense stellar remnants</li>
+      <li>Earth-sized but very heavy</li>
+    </ul>
+    <p><strong>🌌 Neutron Stars</strong></p>
+    <ul>
+      <li>Extremely dense</li>
+      <li>1 teaspoon weighs billions of tons</li>
+      <li>Some become pulsars</li>
+    </ul>
+    <p><strong>⚫ Black Holes</strong></p>
+    <ul>
+      <li>Form from very massive stars</li>
+      <li>Gravity so strong light cannot escape</li>
+    </ul>
+
+    <h2>Common Types</h2>
+    <ul style="list-style:none; font-size:1.1rem; line-height:2.6;">
+      <li class="interactive" onclick="showStarInfo('red')">🔴 Red Dwarf – long-lived, small, cool</li>
+      <li class="interactive" onclick="showStarInfo('yellow')">🟡 Yellow Dwarf – our Sun (~4.6 billion years old)</li>
+      <li class="interactive" onclick="showStarInfo('blue')">🔵 Blue Giant – very hot, short life</li>
+    </ul>
+
+    <h2>⏳ Star Lifespan</h2>
+    <p>A star’s lifespan depends on its mass. Click rows for details!</p>
+    <table class="star-table">
+      <thead><tr><th>Star Size</th><th>Lifespan</th></tr></thead>
+      <tbody>
+        <tr class="massive interactive" onclick="showLifespanInfo('massive')"><td>Massive stars</td><td>Millions of years</td></tr>
+        <tr class="medium interactive" onclick="showLifespanInfo('medium')"><td>Medium stars</td><td>Billions of years</td></tr>
+        <tr class="small interactive" onclick="showLifespanInfo('small')"><td>Small red dwarfs</td><td>Trillions of years</td></tr>
+      </tbody>
+    </table>
+    <p>Why? Bigger stars burn fuel MUCH faster 🔥</p>
+
+    <h2>🌟 Life Cycle of a Star</h2>
+    <p><strong>🟡 Small/Medium Star (like the Sun)</strong></p>
+    <p>Nebula → Protostar → Main Sequence → Red Giant → Planetary Nebula → White Dwarf</p>
+    <p><strong>🔵 Massive Star</strong></p>
+    <p>Nebula → Protostar → Massive Star → Red Supergiant → Supernova → Neutron Star or Black Hole</p>
+    <p>A famous supernova remnant is the Crab Nebula.</p>
+
+    <h2>🤯 Amazing Star Facts</h2>
+    <div class="cards-container">
+      <div class="flip-card"><div class="flip-card-inner"><div class="flip-card-front"><p>✨ Fact 1</p></div><div class="flip-card-back"><p>The Sun contains 99.8% of our solar system's mass</p></div></div></div>
+      <div class="flip-card"><div class="flip-card-inner"><div class="flip-card-front"><p>✨ Fact 2</p></div><div class="flip-card-back"><p>Some stars are over 10 billion years old</p></div></div></div>
+      <div class="flip-card"><div class="flip-card-inner"><div class="flip-card-front"><p>✨ Fact 3</p></div><div class="flip-card-back"><p>The hottest stars are blue, not red</p></div></div></div>
+      <div class="flip-card"><div class="flip-card-inner"><div class="flip-card-front"><p>✨ Fact 4</p></div><div class="flip-card-back"><p>There are an estimated 100–400 billion stars in the Milky Way</p></div></div></div>
+      <div class="flip-card"><div class="flip-card-inner"><div class="flip-card-front"><p>✨ Fact 5</p></div><div class="flip-card-back"><p>The nearest star system is Alpha Centauri</p></div></div></div>
+    </div>
+
+    <h2>🌌 Bonus: What Happens When Stars Die?</h2>
+    <ul>
+      <li>Small stars fade into white dwarfs</li>
+      <li>Massive stars explode in supernovae</li>
+      <li>Heavy elements (like gold and iron) are created during explosions</li>
+    </ul>
+    <p>👉 Everything in your body was once inside a star. You are literally made of stardust ✨</p>
+
+    <div style="text-align:center; margin:2.5rem 0;">
+      <p>Quick quiz: Our Sun is a …</p>
+      <button onclick="check('yellow')">Yellow Dwarf</button>
+      <button onclick="check('red')">Red Giant</button>
+      <button onclick="check('blue')">Blue Supergiant</button>
+      <div id="quiz-result" style="margin-top:1rem; min-height:1.5rem; font-weight:600;"></div>
+    </div>
+    <div class="quiz-container">
+      <p>Bonus Stars Quiz: What is the hottest star color?</p>
+      <button onclick="checkStarsBonus('blue')">Blue</button>
+      <button onclick="checkStarsBonus('red')">Red</button>
+      <button onclick="checkStarsBonus('yellow')">Yellow</button>
+      <div id="stars-bonus-result" class="quiz-result"></div>
+    </div>
+  </div>
+
+  <!-- CONSTELLATIONS -->
+  <div id="constellations" class="page">
+    <h1>Constellations</h1>
+    <p>Draw your own constellation! (drag on canvas) • Load famous ones • Undo &amp; download</p>
+
+    <h2 style="margin-top:2rem; color:var(--accent);">✨ Cosmic Secrets of Stars &amp; Constellations</h2>
+    <div class="fact-cards">
+      <div class="fact-card" onclick="showConstellationFact(0)"><span>🌟</span><strong>STAR</strong></div>
+      <div class="fact-card" onclick="showConstellationFact(1)"><span>☄️</span><strong>METEOR</strong></div>
+      <div class="fact-card" onclick="showConstellationFact(2)"><span>🌫️</span><strong>BIRTHPLACE</strong></div>
+      <div class="fact-card" onclick="showConstellationFact(3)"><span>⏳</span><strong>LIFESPAN</strong></div>
+      <div class="fact-card" onclick="showConstellationFact(4)"><span>💥</span><strong>DEATH</strong></div>
+      <div class="fact-card" onclick="showConstellationFact(5)"><span>🧩</span><strong>FORMING CONSTELLATIONS</strong></div>
+    </div>
+
+    <canvas id="const-canvas" width="600" height="400"></canvas>
+    <div style="text-align:center; margin-top:1rem;">
+      <button onclick="clearCanvas()">🗑️ Clear</button>
+      <button onclick="undoLastStroke()">↩️ Undo</button>
+      <button onclick="drawConstellation('bigDipper')">Big Dipper</button>
+      <button onclick="drawConstellation('orion')">Orion</button>
+      <button onclick="drawConstellation('cassiopeia')">Cassiopeia</button>
+      <button onclick="drawConstellation('leo')">Leo</button>
+      <button onclick="drawConstellation('crux')">Southern Cross</button>
+      <button onclick="downloadConstellation()">💾 Download PNG</button>
+      <button onclick="randomConstellation()">Random Constellation</button>
+    </div>
+    <h2 style="margin-top:2rem; color:var(--accent);">How to Draw Your Own Constellation</h2>
+    <ol style="max-width: 600px; margin: 0 auto; line-height: 1.8;">
+      <li>Click and hold the mouse button on the canvas, then drag to draw lines connecting imaginary stars. Release to stop drawing a line.</li>
+      <li>To add stars, draw short dots or use the loaded constellations as a base.</li>
+      <li>Load famous constellations like Big Dipper or Orion by clicking the buttons to see examples and edit them.</li>
+      <li>If you make a mistake, click "Undo" to remove the last line drawn, or "Clear" to start over.</li>
+      <li>Once your constellation is ready, click "Download PNG" to save it as an image.</li>
+      <li>Try the "Random Constellation" button for inspiration!</li>
+    </ol>
+    <div class="quiz-container">
+      <p>Constellations Quiz: How many official constellations are there?</p>
+      <button onclick="checkConstQuiz(88)">88</button>
+      <button onclick="checkConstQuiz(12)">12</button>
+      <button onclick="checkConstQuiz(100)">100</button>
+      <div id="const-quiz-result" class="quiz-result"></div>
+    </div>
+  </div>
+
+  <!-- GALAXIES – "Click to Spin" removed -->
+  <div id="galaxies" class="page">
+    <h1>Galaxies 🌌</h1>
+    <p>A galaxy is a massive, gravitationally bound system consisting of stars, stellar remnants, interstellar gas, dust, and dark matter. Ranging from dwarfs with millions to giants with trillions of stars, they typically harbor supermassive black holes at their centers. Galaxies are classified into spiral, elliptical, and irregular shapes.</p>
+    
+    <h2>Key Galaxy Facts</h2>
+    <details class="accordion">
+      <summary>Our Home 🌟</summary>
+      <p>The Milky Way is a barred spiral galaxy containing 100–400 billion stars, with our Sun located about 25,000 light-years from its center.</p>
+    </details>
+    <details class="accordion">
+      <summary>Types & Structure 🔄</summary>
+      <p>Galaxies are primarily classified as spiral (pinwheel-shaped), elliptical (smooth/oval), or irregular.</p>
+    </details>
+    <details class="accordion">
+      <summary>Components 🕳️</summary>
+      <p>Most of a galaxy's mass is invisible dark matter, with only a few percent comprised of stars, gas, and dust.</p>
+    </details>
+    <details class="accordion">
+      <summary>Movement & Size 📏</summary>
+      <p>Galaxies can span from a few hundred to over a million light-years across. The Milky Way is about 100,000–200,000 light-years across.</p>
+    </details>
+    <details class="accordion">
+      <summary>Collision Course 💥</summary>
+      <p>Galaxies often collide and merge. The Milky Way is currently absorbing the Sagittarius Dwarf and Canis Major Dwarf galaxies, and will eventually collide with the Andromeda Galaxy.</p>
+    </details>
+    <details class="accordion">
+      <summary>Age ⏳</summary>
+      <p>Most galaxies are 10 to 13.6 billion years old, nearly as old as the 13.8 billion-year-old universe.</p>
+    </details>
+
+    <h2>Fun Facts about the Milky Way</h2>
+    <details class="accordion">
+      <summary>Galactic Year 🌀</summary>
+      <p>It takes our solar system about 250 million years to complete one orbit around the center of the Milky Way.</p>
+    </details>
+    <details class="accordion">
+      <summary>Name Origin 📜</summary>
+      <p>"Milky Way" is derived from a Greek myth about Hera spilling milk, while in China it is known as the "Silver River".</p>
+    </details>
+    <details class="accordion">
+      <summary>Supermassive Black Hole ⚫</summary>
+      <p>At the center of our galaxy lies Sagittarius A*, a black hole with the mass of 4 million suns.</p>
+    </details>
+
+    <p style="text-align:center; font-size:0.9rem; opacity:0.8; margin-top:2rem;">Source: <a href="https://science.nasa.gov/" style="color:var(--accent);">NASA Science</a></p>
+
+    <div id="random-galaxy-fact">
+      <button onclick="showRandomGalaxyFact()">Discover a Random Galaxy Fun Fact!</button>
+      <div id="galaxy-fact-display"></div>
+    </div>
+
+    <h2>Gallery of Galaxies</h2>
+    <div class="gallery">
+      <figure><img src="https://futurism.com/wp-content/uploads/2013/11/suuer1.jpg" alt="Types of Galaxies"><figcaption>Types of Galaxies</figcaption></figure>
+      <figure><img src="https://assets.science.nasa.gov/dynamicimage/assets/science/astro/universe/internal_resources/371/Spiral_Galaxy-1.jpeg?w=1200&h=938&fit=clip&crop=faces%2Cfocalpoint" alt="Spiral Galaxy"><figcaption>Spiral Galaxy</figcaption></figure>
+      <figure><img src="https://astrobackyard.com/wp-content/uploads/2025/11/types-of-galaxies.jpg" alt="Various Galaxies"><figcaption>Various Galaxies</figcaption></figure>
+      <figure><img src="https://assets.science.nasa.gov/dynamicimage/assets/science/astro/universe/2023/09/swift_M31_mosaic_1600.webp" alt="Andromeda Galaxy"><figcaption>Andromeda Galaxy</figcaption></figure>
+      <figure><img src="https://canadiangeographic.ca/wp-content/uploads/2022/07/STScI-01G7ETNMR8CBHQQ64R4CVA1E6T-1440x834.jpg" alt="Deep Space Nebula"><figcaption>Deep Space Nebula</figcaption></figure>
+    </div>
+
+    <h2 style="margin-top:3rem;color:var(--accent);">🌌 Interactive Galaxy Builder</h2>
+    <p style="text-align:center;">Click + drag on the canvas to add new stars! Watch the spiral galaxy rotate and grow.</p>
+    <canvas id="galaxy-sim-canvas" width="620" height="400"></canvas>
+
+    <div style="text-align:center; margin:2rem 0;">
+      <p>Quick Galaxy Quiz: What type of galaxy is the Milky Way?</p>
+      <button onclick="checkGalaxy('barred spiral')">Barred Spiral</button>
+      <button onclick="checkGalaxy('elliptical')">Elliptical</button>
+      <button onclick="checkGalaxy('irregular')">Irregular</button>
+      <div id="galaxy-quiz-result" style="margin-top:1rem; min-height:1.5rem; font-weight:600;"></div>
+    </div>
+    <div class="quiz-container">
+      <p>Bonus Galaxy Quiz: How many galaxies in the observable universe?</p>
+      <button onclick="checkGalaxyBonus(2)">2 trillion</button>
+      <button onclick="checkGalaxyBonus(100)">100 billion</button>
+      <button onclick="checkGalaxyBonus(10)">10 billion</button>
+      <div id="galaxy-bonus-result" class="quiz-result"></div>
+    </div>
+  </div>
+
+  <!-- SOLAR SYSTEMS -->
+  <div id="solarsystem" class="page">
+    <h1>Solar Systems</h1>
+    <p>Eight planets orbit our Sun in real time! Different speeds = different years. Click any planet!</p>
+    <canvas id="solar-canvas" width="620" height="420"></canvas>
+    <div class="solar-controls">
+      <label>Speed: <span id="speed-value">1.0</span>x</label>
+      <input type="range" id="speed-slider" min="0.2" max="8" step="0.2" value="1">
+      <button onclick="togglePause()">⏸️ / ▶️ Pause / Play</button>
+      <button onclick="resetSolar()">Reset Simulation</button>
+    </div>
+    <h2>🌞 The Solar System</h2>
+    <p>The Solar System is the collection of the Sun, eight planets, their moons, asteroids, comets, and other objects that orbit the Sun. It formed about 4.6 billion years ago from a giant cloud of gas and dust.</p>
+    <h2>🪐 The 8 Planets (In Order from the Sun)</h2>
+    <ol>
+      <li><strong>Mercury</strong><br>Closest planet to the Sun
+        <ul><li>Very hot during the day, very cold at night</li><li>No atmosphere to trap heat</li></ul>
+      </li>
+      <li><strong>Venus</strong>
+        <ul><li>Hottest planet</li><li>Thick toxic atmosphere</li><li>Spins backward compared to most planets</li></ul>
+      </li>
+      <li><strong>Earth 🌍</strong>
+        <ul><li>Only known planet with life</li><li>71% covered in water</li><li>Has one Moon</li></ul>
+      </li>
+      <li><strong>Mars 🔴</strong>
+        <ul><li>Known as the Red Planet</li><li>Has the largest volcano in the solar system</li><li>Target of many space missions</li></ul>
+      </li>
+      <li><strong>Jupiter</strong>
+        <ul><li>Largest planet</li><li>Has a giant storm called the Great Red Spot</li><li>Strong magnetic field</li></ul>
+      </li>
+      <li><strong>Saturn</strong>
+        <ul><li>Famous for its beautiful ring system</li><li>Less dense than water</li></ul>
+      </li>
+      <li><strong>Uranus</strong>
+        <ul><li>Rotates on its side</li><li>Has faint rings</li></ul>
+      </li>
+      <li><strong>Neptune</strong>
+        <ul><li>Farthest planet</li><li>Strongest winds in the solar system</li></ul>
+      </li>
+    </ol>
+    <h2>🌙 Other Important Parts</h2>
+    <p><strong>🌕 Moons</strong><br>Many planets have natural satellites. Jupiter and Saturn have dozens of moons.</p>
+    <p><strong>☄️ Asteroids</strong><br>Rocky objects mostly found in the Asteroid Belt between Mars and Jupiter.</p>
+    <p><strong>🌠 Comets</strong><br>Ice and dust objects that form glowing tails when near the Sun.</p>
+    <p><strong>🪨 Dwarf Planets</strong><br>Pluto is now classified as a dwarf planet. It was reclassified in 2006 by the International Astronomical Union.</p>
+    <h2>🌌 How the Solar System Formed</h2>
+    <ol>
+      <li>Giant gas cloud (solar nebula) collapsed</li>
+      <li>Gravity pulled material into a spinning disk</li>
+      <li>The Sun formed at the center</li>
+      <li>Dust and rock collided to form planets</li>
+    </ol>
+    <p>This is called the Nebular Theory.</p>
+    <h2>📏 Size & Scale</h2>
+    <ul>
+      <li>Diameter: About 287 billion km</li>
+      <li>Light from the Sun takes 8 minutes to reach Earth</li>
+      <li>The outer boundary is called the Oort Cloud</li>
+    </ul>
+    <h2>🤯 Cool Solar System Facts</h2>
+    <ul>
+      <li>✨ Jupiter could fit over 1,300 Earths inside it</li>
+      <li>✨ A day on Venus is longer than a year on Venus</li>
+      <li>✨ Neptune was discovered using math before it was seen</li>
+      <li>✨ The Sun contains 99.8% of the Solar System's mass</li>
+    </ul>
+    <div class="quiz-container">
+      <p>Solar Quiz: Which planet is hottest?</p>
+      <button onclick="checkSolarQuiz('venus')">Venus</button>
+      <button onclick="checkSolarQuiz('mercury')">Mercury</button>
+      <button onclick="checkSolarQuiz('earth')">Earth</button>
+      <div id="solar-quiz-result" class="quiz-result"></div>
+    </div>
+  </div>
+
+  <!-- EXPEDITIONS -->
+  <div id="expeditions" class="page">
+    <h1>Human Expeditions</h1>
+    <p>🚀 Human Expeditions into Space</p>
+    <p>Human space exploration is the effort to send astronauts and spacecraft beyond Earth to explore the Moon, planets, and deep space. It began during the Space Race between the United States and the Soviet Union.</p>
+    <h2>🛰️ The Beginning of Human Spaceflight</h2>
+    <h3>🧑‍🚀 First Human in Space (1961)</h3>
+    <p>Yuri Gagarin</p>
+    <ul>
+      <li>Spacecraft: Vostok 1</li>
+      <li>Country: Soviet Union</li>
+      <li>First person to orbit Earth</li>
+    </ul>
+    <h3>🇺🇸 First American in Space</h3>
+    <p>Alan Shepard</p>
+    <ul>
+      <li>Mission: Freedom 7</li>
+    </ul>
+    <h2>🌕 Moon Landings</h2>
+    <h3>🏆 First Humans on the Moon (1969)</h3>
+    <p>Mission: Apollo 11</p>
+    <p>Astronauts:</p>
+    <ul>
+      <li>Neil Armstrong</li>
+      <li>Buzz Aldrin</li>
+      <li>Michael Collins</li>
+    </ul>
+    <p>Neil Armstrong’s famous words: “That’s one small step for man, one giant leap for mankind.”</p>
+    <p>The Moon landing was achieved by NASA.</p>
+    <h2>🛰 Space Stations</h2>
+    <h3>🌍 International Cooperation in Space</h3>
+    <p>International Space Station (ISS)</p>
+    <ul>
+      <li>Began construction in 1998</li>
+      <li>Orbits Earth every 90 minutes</li>
+      <li>Laboratory for science experiments</li>
+      <li>Involves NASA, Roscosmos, ESA, JAXA, and CSA</li>
+    </ul>
+    <p>Astronauts live there for months at a time.</p>
+    <h2>🔴 Mars Exploration</h2>
+    <p>Although humans haven’t landed on Mars yet, robotic missions have explored it.</p>
+    <h3>🚗 Mars Rovers</h3>
+    <ul>
+      <li>Curiosity</li>
+      <li>Perseverance</li>
+    </ul>
+    <p>NASA is planning future human missions under the Artemis program, which aims to return humans to the Moon and eventually go to Mars.</p>
+    <h2>🚀 Modern Space Exploration</h2>
+    <h3>🏢 Private Space Companies</h3>
+    <ul>
+      <li>SpaceX</li>
+      <li>Blue Origin</li>
+    </ul>
+    <p>Elon Musk founded SpaceX, which has:</p>
+    <ul>
+      <li>Reusable rockets</li>
+      <li>Sent astronauts to the ISS</li>
+      <li>Plans for Mars colonization</li>
+    </ul>
+    <h2>🌌 Why Human Expeditions Matter</h2>
+    <ul>
+      <li>✔ Advance science</li>
+      <li>✔ Develop new technology</li>
+      <li>✔ Search for life</li>
+      <li>✔ Expand human presence beyond Earth</li>
+      <li>✔ Inspire future generations</li>
+    </ul>
+    <h2>🤯 Amazing Facts</h2>
+    <ul>
+      <li>✨ Humans have walked on the Moon only 12 times</li>
+      <li>✨ Over 600 people have traveled to space</li>
+      <li>✨ The ISS travels at 28,000 km/h</li>
+      <li>✨ Space travel affects muscles and bones due to microgravity</li>
+    </ul>
+
+    <h2>📅 Interactive Space Exploration Timeline</h2>
+    <div class="timeline-grid">
+      <div class="timeline-event" onclick="showTimeline(0)"><span style="font-size:2rem;">1961</span><strong>First Human in Space</strong></div>
+      <div class="timeline-event" onclick="showTimeline(1)"><span style="font-size:2rem;">1969</span><strong>Apollo 11 Moon Landing</strong></div>
+      <div class="timeline-event" onclick="showTimeline(2)"><span style="font-size:2rem;">1998</span><strong>ISS Construction</strong></div>
+      <div class="timeline-event" onclick="showTimeline(3)"><span style="font-size:2rem;">2020</span><strong>Commercial Crew</strong></div>
+    </div>
+
+    <div style="text-align:center; margin:2rem 0;">
+      <p>Who was first in space?</p>
+      <button onclick="checkExp('yuri')">Yuri Gagarin</button>
+      <button onclick="checkExp('neil')">Neil Armstrong</button>
+      <div id="exp-result" style="margin-top:1rem; font-weight:600;"></div>
+    </div>
+    <div class="quiz-container">
+      <p>Expeditions Quiz: Who founded SpaceX?</p>
+      <button onclick="checkExpBonus('elon')">Elon Musk</button>
+      <button onclick="checkExpBonus('jeff')">Jeff Bezos</button>
+      <button onclick="checkExpBonus('richard')">Richard Branson</button>
+      <div id="exp-bonus-result" class="quiz-result"></div>
+    </div>
+  </div>
+</main>
+
+<!-- LIGHTBOX -->
+<div id="lightbox">
+  <span id="close-btn" onclick="closeLightbox()">×</span>
+  <button id="prev-btn" onclick="changeImage(-1)">&lt;</button>
+  <div id="lightbox-content"><img id="lightbox-img" src=""></div>
+  <button id="next-btn" onclick="changeImage(1)">&gt;</button>
+</div>
+
+<!-- INFO MODAL -->
+<div id="info-modal">
+  <div class="modal-content" onclick="event.stopImmediatePropagation()">
+    <span class="close-modal" onclick="closeInfoModal()">×</span>
+    <h3 id="modal-title"></h3>
+    <div id="modal-demo" class="demo"></div>
+    <p id="modal-text"></p>
+  </div>
+</div>
+
+<script>
+// ─── Global Cosmic Score ────────────────────────────────────────
+let cosmicScore = 0;
+const scoreEl = document.getElementById('cosmic-score');
+
+function updateScore() {
+  scoreEl.textContent = `${cosmicScore} ✨ Cosmic Score`;
+}
+
+function launchConfetti() {
+  for (let i = 0; i < 80; i++) {
+    const c = document.createElement('div');
+    c.style.position = 'fixed';
+    c.style.zIndex = '9999';
+    c.style.left = Math.random() * 100 + 'vw';
+    c.style.top = '-30px';
+    c.style.fontSize = (15 + Math.random() * 25) + 'px';
+    c.style.pointerEvents = 'none';
+    c.textContent = ['🌟','✨','⭐','☄️','🪐'][Math.floor(Math.random()*5)];
+    document.body.appendChild(c);
+    const duration = 1800 + Math.random() * 2200;
+    c.animate([{ transform: 'translateY(0) rotate(0deg)', opacity: 1 }, { transform: `translateY(${window.innerHeight + 100}px) rotate(${Math.random() * 1800 - 900}deg)`, opacity: 0 }], { duration: duration, easing: 'cubic-bezier(.22,1,.36,1)' });
+    setTimeout(() => c.remove(), duration + 100);
+  }
+}
+
+// ─── Background ────────────────────────────────────────────────
+const space = document.getElementById('space');
+function createStars(count = 220) {
+  for (let i = 0; i < count; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    s.style.width = s.style.height = Math.random() * 3 + 0.6 + 'px';
+    s.style.left = Math.random() * 100 + '%';
+    s.style.top = Math.random() * 100 + '%';
+    s.style.animationDelay = Math.random() * 5 + 's';
+    space.appendChild(s);
+  }
+}
+function createMeteors(count = 12) {
+  for (let i = 0; i < count; i++) {
+    const m = document.createElement('div');
+    m.className = 'meteor';
+    m.style.animationDuration = (Math.random() * 4 + 2.5) + 's';
+    m.style.animationDelay = Math.random() * 8 + 's';
+    m.style.left = Math.random() * 100 + '%';
+    space.appendChild(m);
+  }
+}
+createStars();
+createMeteors();
+
+// ─── Navigation ────────────────────────────────────────────────
+document.querySelectorAll('.nav-link').forEach(link => {
+  link.addEventListener('click', e => {
+    e.preventDefault();
+    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+    link.classList.add('active');
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelector(link.getAttribute('href')).classList.add('active');
+  });
+});
+
+// ─── Home Random Fact ──────────────────────────────────────────
+const facts = ["There are more trees on Earth than stars in the Milky Way.","A teaspoon of neutron star material weighs ~6 billion tons.","The Sun is ~4.6 billion years old — halfway through its life.","Light from the farthest galaxies we see left billions of years ago.","One day on Venus lasts longer than one year on Venus."];
+document.getElementById('random-fact').onclick = () => {
+  const el = document.getElementById('random-fact');
+  el.textContent = facts[Math.floor(Math.random() * facts.length)];
+  el.style.opacity = 0;
+  setTimeout(() => el.style.opacity = 1, 120);
+};
+
+// ─── QUIZZES ───────────────────────────────────────────────────
+function check(answer) {
+  const res = document.getElementById('quiz-result');
+  if (answer === 'yellow') { res.textContent = "✓ Correct! The Sun is a yellow (G-type) dwarf star."; res.style.color = '#0f0'; cosmicScore += 30; updateScore(); launchConfetti(); }
+  else { res.textContent = "✗ Nope — try again!"; res.style.color = '#f88'; }
+}
+function checkHomeQuiz(answer) {
+  const res = document.getElementById('home-quiz-result');
+  if (answer === 8) { res.textContent = "✓ Correct! There are 8 planets."; res.style.color = '#0f0'; cosmicScore += 25; updateScore(); launchConfetti(); }
+  else { res.textContent = "✗ Nope — try again!"; res.style.color = '#f88'; }
+}
+function checkStarsBonus(answer) {
+  const res = document.getElementById('stars-bonus-result');
+  if (answer === 'blue') { res.textContent = "✓ Correct! Blue stars are the hottest."; res.style.color = '#0f0'; cosmicScore += 25; updateScore(); launchConfetti(); }
+  else { res.textContent = "✗ Nope — try again!"; res.style.color = '#f88'; }
+}
+function checkConstQuiz(answer) {
+  const res = document.getElementById('const-quiz-result');
+  if (answer === 88) { res.textContent = "✓ Correct! There are 88 official constellations."; res.style.color = '#0f0'; cosmicScore += 25; updateScore(); launchConfetti(); }
+  else { res.textContent = "✗ Nope — try again!"; res.style.color = '#f88'; }
+}
+function checkGalaxy(answer) {
+  const res = document.getElementById('galaxy-quiz-result');
+  if (answer === 'barred spiral') { res.textContent = "✓ Correct! The Milky Way is a barred spiral galaxy. 🌌"; res.style.color = '#0f0'; cosmicScore += 30; updateScore(); launchConfetti(); }
+  else { res.textContent = "✗ Nope — it's a barred spiral! Try again!"; res.style.color = '#f88'; }
+}
+function checkGalaxyBonus(answer) {
+  const res = document.getElementById('galaxy-bonus-result');
+  if (answer === 2) { res.textContent = "✓ Correct! Over 2 trillion."; res.style.color = '#0f0'; cosmicScore += 25; updateScore(); launchConfetti(); }
+  else { res.textContent = "✗ Nope — try again!"; res.style.color = '#f88'; }
+}
+function checkSolarQuiz(answer) {
+  const res = document.getElementById('solar-quiz-result');
+  if (answer === 'venus') { res.textContent = "✓ Correct! Venus is the hottest."; res.style.color = '#0f0'; cosmicScore += 25; updateScore(); launchConfetti(); }
+  else { res.textContent = "✗ Nope — try again!"; res.style.color = '#f88'; }
+}
+function checkExp(answer) {
+  const res = document.getElementById('exp-result');
+  if (answer === 'yuri') { res.textContent = "✓ Yes! Yuri Gagarin — April 12, 1961"; res.style.color = '#0f0'; cosmicScore += 30; updateScore(); launchConfetti(); }
+  else { res.textContent = "✗ No — that was Yuri Gagarin."; res.style.color = '#f88'; }
+}
+function checkExpBonus(answer) {
+  const res = document.getElementById('exp-bonus-result');
+  if (answer === 'elon') { res.textContent = "✓ Correct! Elon Musk."; res.style.color = '#0f0'; cosmicScore += 25; updateScore(); launchConfetti(); }
+  else { res.textContent = "✗ Nope — try again!"; res.style.color = '#f88'; }
+}
+
+// ─── MODALS ────────────────────────────────────────────────────
+function showStarTypeInfo(type) {
+  const modal = document.getElementById('info-modal');
+  const title = document.getElementById('modal-title');
+  const demo = document.getElementById('modal-demo');
+  const text = document.getElementById('modal-text');
+  let info = '';
+  switch (type) {
+    case 'O': info = 'Hottest and most massive stars, rare and short-lived.'; demo.textContent = 'O'; demo.style.color = '#0000ff'; break;
+    case 'B': info = 'Hot, blue-white stars, very bright.'; demo.textContent = 'B'; demo.style.color = '#add8e6'; break;
+    case 'A': info = 'White stars, like Sirius, the brightest in the sky.'; demo.textContent = 'A'; demo.style.color = '#ffffff'; break;
+    case 'F': info = 'Yellow-white stars, hotter than the Sun.'; demo.textContent = 'F'; demo.style.color = '#ffffe0'; break;
+    case 'G': info = 'Yellow stars, like our Sun.'; demo.textContent = 'G'; demo.style.color = '#ffff00'; break;
+    case 'K': info = 'Orange stars, cooler than the Sun.'; demo.textContent = 'K'; demo.style.color = '#ffa500'; break;
+    case 'M': info = 'Red stars, most common in the universe.'; demo.textContent = 'M'; demo.style.color = '#ff0000'; break;
+  }
+  title.textContent = `${type}-Type Star`;
+  text.innerHTML = info;
+  modal.style.display = 'flex';
+}
+
+function showLifespanInfo(size) {
+  const modal = document.getElementById('info-modal');
+  const title = document.getElementById('modal-title');
+  const demo = document.getElementById('modal-demo');
+  const text = document.getElementById('modal-text');
+  let info = '';
+  switch (size) {
+    case 'massive': info = 'Massive stars live fast and die young, exploding as supernovae.'; demo.textContent = '💥'; break;
+    case 'medium': info = 'Medium stars like the Sun have balanced lives, lasting billions of years.'; demo.textContent = '🌞'; break;
+    case 'small': info = 'Small red dwarfs can outlive the current age of the universe.'; demo.textContent = '🔴'; break;
+  }
+  title.textContent = `${size.charAt(0).toUpperCase() + size.slice(1)} Stars Lifespan`;
+  text.innerHTML = info;
+  modal.style.display = 'flex';
+}
+
+function showStarInfo(type) {
+  const modal = document.getElementById('info-modal');
+  const title = document.getElementById('modal-title');
+  const demo = document.getElementById('modal-demo');
+  const text = document.getElementById('modal-text');
+  if (type === 'red') { title.textContent = '🔴 Red Dwarf'; demo.textContent = '🔴'; demo.style.color = '#ff6666'; text.innerHTML = 'Smallest &amp; coolest stars.<br>Can live for <strong>trillions</strong> of years.<br>Most common type in the Milky Way!'; }
+  else if (type === 'yellow') { title.textContent = '🟡 Yellow Dwarf'; demo.textContent = '🟡'; demo.style.color = '#ffdd44'; text.innerHTML = 'Our Sun is one!<br>Stable for ~10 billion years.<br>Perfect temperature for life on Earth.'; }
+  else if (type === 'blue') { title.textContent = '🔵 Blue Giant'; demo.textContent = '🔵'; demo.style.color = '#88ccff'; text.innerHTML = 'Extremely hot (20,000–50,000°C).<br>Live only a few million years.<br>End in spectacular supernovae!'; }
+  modal.style.display = 'flex';
+}
+
+// ─── Star Classifier ───────────────────────────────────────────
+function initStarClassifier() {
+  const tempSlider = document.getElementById('temp-slider');
+  const massSlider = document.getElementById('mass-slider');
+  const tempVal = document.getElementById('temp-val');
+  const massVal = document.getElementById('mass-val');
+  const starEmoji = document.getElementById('classified-star');
+  const starClassEl = document.getElementById('star-class');
+
+  function classify() {
+    const temp = parseFloat(tempSlider.value);
+    const mass = parseFloat(massSlider.value);
+    tempVal.textContent = temp + ' K';
+    massVal.textContent = mass.toFixed(1) + ' M☉';
+
+    let emoji = '⭐', color = '#fff', cls = '';
+    if (temp > 30000) { cls = 'O'; emoji = '🔵'; color = '#4488ff'; }
+    else if (temp > 10000) { cls = 'B'; emoji = '🔵'; color = '#99ccff'; }
+    else if (temp > 7500) { cls = 'A'; emoji = '⚪'; color = '#ffffff'; }
+    else if (temp > 6000) { cls = 'F'; emoji = '🟡'; color = '#ffeeaa'; }
+    else if (temp > 5200) { cls = 'G'; emoji = '☀️'; color = '#ffdd00'; }
+    else if (temp > 3700) { cls = 'K'; emoji = '🟠'; color = '#ffaa44'; }
+    else { cls = 'M'; emoji = '🔴'; color = '#ff4444'; }
+
+    if (mass > 20) { cls += ' Hypergiant'; emoji = '🌟'; }
+    else if (mass > 8) { cls += ' Supergiant'; emoji = '🌟'; }
+    else if (mass > 2) { cls += ' Giant'; }
+
+    starEmoji.textContent = emoji;
+    starEmoji.style.color = color;
+    starClassEl.textContent = `${cls}-Type Star`;
+  }
+  tempSlider.addEventListener('input', classify);
+  massSlider.addEventListener('input', classify);
+  classify();
+}
+
+// ─── Constellation Canvas ──────────────────────────────────────
+const canvas = document.getElementById('const-canvas');
+const ctx = canvas.getContext('2d');
+let drawing = false;
+let strokes = [];
+let currentPath = [];
+let bgStars = [];
+
+function initBgStars() {
+  bgStars = [];
+  for (let i = 0; i < 140; i++) {
+    bgStars.push({ x: Math.random() * canvas.width, y: Math.random() * canvas.height, size: Math.random() * 2.8 + 0.6, baseOp: Math.random() * 0.7 + 0.3, speed: Math.random() * 0.12 + 0.04, phase: Math.random() * Math.PI * 2 });
+  }
+}
+
+function redrawCanvas() {
+  ctx.fillStyle = '#000011'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+  const t = Date.now() / 800;
+  bgStars.forEach(s => {
+    const op = s.baseOp + Math.sin(t * s.speed + s.phase) * 0.45;
+    ctx.fillStyle = `rgba(255,255,255,${Math.max(0.2, op)})`;
+    ctx.beginPath(); ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2); ctx.fill();
+  });
+  ctx.strokeStyle = 'rgba(220,240,255,0.92)'; ctx.lineWidth = 3.5; ctx.lineCap = 'round';
+  strokes.forEach(path => {
+    if (!path.length) return;
+    ctx.beginPath(); ctx.moveTo(path[0].x, path[0].y);
+    for (let i = 1; i < path.length; i++) ctx.lineTo(path[i].x, path[i].y);
+    ctx.stroke();
+  });
+}
+
+canvas.addEventListener('pointerdown', e => { drawing = true; currentPath = []; const rect = canvas.getBoundingClientRect(); const x = e.clientX - rect.left; const y = e.clientY - rect.top; ctx.beginPath(); ctx.moveTo(x, y); currentPath.push({x, y}); });
+canvas.addEventListener('pointerup', () => { if (drawing && currentPath.length) strokes.push([...currentPath]); drawing = false; redrawCanvas(); });
+canvas.addEventListener('pointermove', e => {
+  if (!drawing) return;
+  const rect = canvas.getBoundingClientRect();
+  const x = e.clientX - rect.left; const y = e.clientY - rect.top;
+  ctx.lineWidth = 3.5; ctx.lineCap = 'round'; ctx.strokeStyle = 'rgba(255,240,180,0.95)';
+  ctx.lineTo(x, y); ctx.stroke(); ctx.beginPath(); ctx.moveTo(x, y);
+  currentPath.push({x, y});
+});
+
+function clearCanvas() { strokes = []; redrawCanvas(); }
+function undoLastStroke() { if (strokes.length) { strokes.pop(); redrawCanvas(); } }
+function downloadConstellation() {
+  const link = document.createElement('a');
+  link.download = 'my-constellation.png';
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+}
+function drawConstellation(name) {
+  clearCanvas();
+  let points = [];
+  if (name === 'bigDipper') points = [[150,100],[220,80],[300,140],[280,220],[180,260],[150,100],[220,80],[300,140]];
+  else if (name === 'orion') points = [[250,50],[200,150],[300,150],[200,150],[250,250],[300,150],[225,200],[250,200],[275,200],[225,200],[200,300],[275,200],[300,300]];
+  else if (name === 'cassiopeia') points = [[100,150],[200,100],[250,200],[350,150],[400,250]];
+  else if (name === 'leo') points = [[100,200],[150,150],[200,200],[250,150],[300,200],[200,200],[200,250],[150,300],[250,300]];
+  else if (name === 'crux') points = [[250,100],[250,300],[150,200],[350,200]];
+
+  ctx.strokeStyle = 'rgba(220,240,255,0.9)'; ctx.lineWidth = 3.5;
+  ctx.beginPath(); ctx.moveTo(points[0][0], points[0][1]);
+  for (let i = 1; i < points.length; i++) ctx.lineTo(points[i][0], points[i][1]);
+  ctx.stroke();
+  ctx.fillStyle = '#fff';
+  points.forEach(p => { ctx.beginPath(); ctx.arc(p[0], p[1], 6, 0, Math.PI*2); ctx.fill(); });
+  strokes.push(points.map(([x,y]) => ({x,y})));
+  redrawCanvas();
+}
+function randomConstellation() {
+  clearCanvas();
+  const numStars = Math.floor(Math.random() * 12) + 6;
+  const points = [];
+  ctx.fillStyle = '#fff';
+  for (let i = 0; i < numStars; i++) {
+    const x = Math.random() * canvas.width;
+    const y = Math.random() * canvas.height;
+    points.push([x, y]);
+    ctx.beginPath(); ctx.arc(x, y, 5.5, 0, Math.PI*2); ctx.fill();
+  }
+  ctx.strokeStyle = 'rgba(220,240,255,0.9)'; ctx.lineWidth = 3.5;
+  ctx.beginPath(); ctx.moveTo(points[0][0], points[0][1]);
+  for (let i = 1; i < points.length; i++) ctx.lineTo(points[i][0], points[i][1]);
+  ctx.stroke();
+  strokes.push(points.map(([x,y]) => ({x,y})));
+  redrawCanvas();
+}
+
+// ─── Galaxy Simulator ──────────────────────────────────────────
+let galaxyParticles = [];
+let galaxyCanvas, gctx;
+let isDraggingGalaxy = false;
+
+function initGalaxySim() {
+  galaxyCanvas = document.getElementById('galaxy-sim-canvas');
+  gctx = galaxyCanvas.getContext('2d');
+  galaxyParticles = [];
+  for (let arm = 0; arm < 5; arm++) {
+    for (let i = 0; i < 320; i++) {
+      const baseA = (i / 280) * Math.PI * 9 + arm * (Math.PI * 2 / 5);
+      galaxyParticles.push({ baseAngle: baseA, radius: i * 0.75 + 15, size: 1.2 + Math.random() * 2.4, hue: 195 + Math.random() * 75, speed: 0.0008 + Math.random() * 0.0022 });
+    }
+  }
+  function drawGalaxy() {
+    gctx.fillStyle = 'rgba(2,0,18,0.18)'; gctx.fillRect(0, 0, 620, 400);
+    gctx.save(); gctx.translate(310, 200);
+    const time = Date.now() / 920;
+    galaxyParticles.forEach(p => {
+      const ang = p.baseAngle + time * p.speed;
+      let x = Math.cos(ang) * p.radius;
+      let y = Math.sin(ang) * p.radius * 0.48;
+      const twist = Math.sin(ang * 2.8) * 22;
+      x += Math.cos(ang) * twist;
+      y += Math.sin(ang) * twist * 0.5;
+      gctx.fillStyle = `hsla(${p.hue}, 95%, 98%, 0.95)`;
+      gctx.fillRect(x - p.size/2, y - p.size/2, p.size, p.size);
+    });
+    gctx.restore();
+    requestAnimationFrame(drawGalaxy);
+  }
+  drawGalaxy();
+
+  galaxyCanvas.addEventListener('pointerdown', () => isDraggingGalaxy = true);
+  galaxyCanvas.addEventListener('pointerup', () => isDraggingGalaxy = false);
+  galaxyCanvas.addEventListener('pointermove', e => {
+    if (!isDraggingGalaxy) return;
+    const rect = galaxyCanvas.getBoundingClientRect();
+    const mx = e.clientX - rect.left - 310;
+    const my = e.clientY - rect.top - 200;
+    for (let i = 0; i < 14; i++) {
+      const offset = Math.random() * 26 - 13;
+      const ang = Math.atan2(my, mx) + offset * 0.1;
+      const rad = Math.hypot(mx, my) + (Math.random() - 0.5) * 35;
+      galaxyParticles.push({ baseAngle: ang, radius: rad, size: 1.8 + Math.random() * 3, hue: 180 + Math.random() * 110, speed: 0.0012 + Math.random() * 0.003 });
+    }
+  });
+}
+
+// ─── Solar System ──────────────────────────────────────────────
+const solarCanvas = document.getElementById('solar-canvas');
+const sctx = solarCanvas.getContext('2d');
+let solarAngle = 0;
+let isPaused = false;
+let speedMultiplier = 1;
+
+const planets = [
+  {name:'Mercury', dist:65, speed:4.1, size:6, color:'#aaa'},
+  {name:'Venus', dist:95, speed:1.6, size:9, color:'#ffcc77'},
+  {name:'Earth', dist:130, speed:1, size:10, color:'#44aaff'},
+  {name:'Mars', dist:165, speed:0.53, size:8, color:'#ff4444'},
+  {name:'Jupiter', dist:215, speed:0.084, size:18, color:'#ddaa77'},
+  {name:'Saturn', dist:270, speed:0.034, size:15, color:'#eedd99'},
+  {name:'Uranus', dist:325, speed:0.012, size:12, color:'#aaddff'},
+  {name:'Neptune', dist:375, speed:0.006, size:12, color:'#4488ff'}
+];
+
+const asteroids = Array.from({length: 48}, () => ({ angle: Math.random() * Math.PI * 2, dist: 182 + Math.random() * 58, speed: 0.18 + Math.random() * 0.38, size: 1.8 + Math.random() * 3.2, rot: Math.random() * Math.PI * 2, rotSpeed: (Math.random() - 0.5) * 0.2 }));
+
+let comet = { angle: Math.random() * Math.PI * 2, dist: 430, speed: 1.1, tail: 38 };
+
+function drawSolarSystem() {
+  sctx.clearRect(0, 0, 620, 420);
+  sctx.save(); sctx.shadowBlur = 45; sctx.shadowColor = '#ff0'; sctx.fillStyle = '#ffdd00';
+  sctx.beginPath(); sctx.arc(310, 210, 29, 0, Math.PI*2); sctx.fill(); sctx.restore();
+
+  if (!isPaused) solarAngle += 0.008 * speedMultiplier;
+
+  planets.forEach(p => {
+    const rad = solarAngle * p.speed;
+    const x = 310 + Math.cos(rad) * p.dist;
+    const y = 210 + Math.sin(rad) * p.dist * 0.55;
+    sctx.strokeStyle = 'rgba(255,255,255,0.13)';
+    sctx.beginPath(); sctx.ellipse(310, 210, p.dist, p.dist*0.55, 0, 0, Math.PI*2); sctx.stroke();
+    sctx.fillStyle = p.color; sctx.beginPath(); sctx.arc(x, y, p.size, 0, Math.PI*2); sctx.fill();
+    sctx.fillStyle = '#fff'; sctx.font = '10px system-ui'; sctx.textAlign = 'center';
+    sctx.fillText(p.name, x, y - p.size - 10);
+  });
+
+  asteroids.forEach(a => {
+    a.angle += a.speed * 0.008 * speedMultiplier * 0.75;
+    a.rot += a.rotSpeed * speedMultiplier;
+    const x = 310 + Math.cos(a.angle) * a.dist;
+    const y = 210 + Math.sin(a.angle) * a.dist * 0.55;
+    sctx.save(); sctx.translate(x, y); sctx.rotate(a.rot);
+    sctx.fillStyle = '#777'; sctx.fillRect(-a.size/2, -a.size*0.55, a.size, a.size*1.1);
+    sctx.restore();
+  });
+
+  comet.angle += comet.speed * 0.008 * speedMultiplier * 0.4;
+  const cx = 310 + Math.cos(comet.angle) * comet.dist;
+  const cy = 210 + Math.sin(comet.angle) * comet.dist * 0.55;
+  sctx.fillStyle = '#fff'; sctx.beginPath(); sctx.arc(cx, cy, 5, 0, Math.PI*2); sctx.fill();
+  sctx.strokeStyle = 'rgba(200,230,255,0.65)'; sctx.lineWidth = 4;
+  sctx.beginPath();
+  const tx = cx - Math.cos(comet.angle) * comet.tail;
+  const ty = cy - Math.sin(comet.angle) * comet.tail * 0.55;
+  sctx.moveTo(cx, cy); sctx.lineTo(tx, ty); sctx.stroke();
+
+  requestAnimationFrame(drawSolarSystem);
+}
+
+solarCanvas.addEventListener('click', e => {
+  const rect = solarCanvas.getBoundingClientRect();
+  const mx = e.clientX - rect.left; const my = e.clientY - rect.top;
+  if (Math.hypot(mx - 310, my - 210) < 45) {
+    const modal = document.getElementById('info-modal');
+    document.getElementById('modal-title').textContent = 'The Sun';
+    document.getElementById('modal-demo').textContent = '☀️';
+    document.getElementById('modal-demo').style.color = '#ffdd00';
+    document.getElementById('modal-text').innerHTML = 'Our local star.<br>99.8% of the Solar System\'s mass.<br>Core temperature: 15 million °C';
+    modal.style.display = 'flex';
+    return;
+  }
+  for (let p of planets) {
+    const rad = solarAngle * p.speed;
+    const px = 310 + Math.cos(rad) * p.dist;
+    const py = 210 + Math.sin(rad) * p.dist * 0.55;
+    if (Math.hypot(px - mx, py - my) < p.size + 18) {
+      const modal = document.getElementById('info-modal');
+      document.getElementById('modal-title').textContent = p.name;
+      document.getElementById('modal-demo').textContent = '🪐';
+      document.getElementById('modal-demo').style.color = p.color;
+      document.getElementById('modal-text').innerHTML = `Scaled distance: ${p.dist} units<br>Orbital period: ~${(365 / p.speed).toFixed(0)} Earth days`;
+      modal.style.display = 'flex';
+      return;
+    }
+  }
+});
+
+const slider = document.getElementById('speed-slider');
+const speedValue = document.getElementById('speed-value');
+slider.addEventListener('input', () => { speedMultiplier = parseFloat(slider.value); speedValue.textContent = speedMultiplier.toFixed(1); });
+
+function togglePause() { isPaused = !isPaused; }
+function resetSolar() { solarAngle = 0; }
+
+// ─── Random Galaxy Fact ────────────────────────────────────────
+const galaxyFacts = [
+  "The Milky Way has a supermassive black hole at its center called Sagittarius A*.",
+  "Galaxies can collide, and the Milky Way will merge with Andromeda in about 4.5 billion years.",
+  "There are over 2 trillion galaxies in the observable universe.",
+  "The word 'galaxy' comes from the Greek word for milk.",
+  "Some galaxies have active nuclei that emit more energy than the rest of the galaxy combined."
+];
+function showRandomGalaxyFact() {
+  const display = document.getElementById('galaxy-fact-display');
+  display.textContent = galaxyFacts[Math.floor(Math.random() * galaxyFacts.length)];
+  display.style.opacity = 0;
+  setTimeout(() => display.style.opacity = 1, 100);
+}
+
+// ─── Constellation Facts ───────────────────────────────────────
+const constellationFacts = [
+  { title: "🌟 What is a STAR?", emoji: "🌟", text: "A natural luminous body visible in the sky especially at night.<br><br>A self-luminous gaseous spheroidal celestial body of great mass which produces energy by means of nuclear fusion reactions." },
+  { title: "☄️ Shooting Star (Meteor)", emoji: "☄️", text: "A small piece of rock or dust from space that burns up upon entering Earth's atmosphere at high speeds (30-70 km/s), creating a bright streak of light.<br><br>They are NOT actually stars — they are meteoroids! Best seen during showers like the Perseids." },
+  { title: "🌫️ Birthplace of Stars", emoji: "🌫️", text: "Stars are born in large clouds of dust and gas called nebulas or molecular clouds." },
+  { title: "⏳ Star Lifespan", emoji: "⏳", text: "Smaller, less massive stars (red dwarfs) live for trillions of years, while massive stars burn through fuel quickly and may only live for a few million years." },
+  { title: "💥 Star Death", emoji: "💥", text: "Massive stars end in spectacular supernova explosions, while smaller ones may quietly fade into white dwarfs." },
+  { title: "🧩 Forming Constellations", emoji: "🧩", text: "Constellations are not physically formed in space.<br><br>They are “created” by humans who connect bright, unrelated stars into imaginary, recognizable shapes.<br><br>These 88 official patterns are based on myths, animals, or objects. The stars often look close together from Earth, but they are actually vast distances apart." }
+];
+function showConstellationFact(index) {
+  const fact = constellationFacts[index];
+  const modal = document.getElementById('info-modal');
+  document.getElementById('modal-title').innerHTML = fact.title;
+  document.getElementById('modal-demo').textContent = fact.emoji;
+  document.getElementById('modal-text').innerHTML = fact.text;
+  modal.style.display = 'flex';
+}
+
+// ─── Timeline ──────────────────────────────────────────────────
+const timelineData = [
+  {year:"1961", title:"First Human in Space", text:"Yuri Gagarin orbits Earth in Vostok 1 on April 12, 1961."},
+  {year:"1969", title:"Moon Landing", text:"Apollo 11 — Neil Armstrong &amp; Buzz Aldrin walk on the Moon."},
+  {year:"1998", title:"International Space Station", text:"Construction of the ISS begins — a symbol of global cooperation."},
+  {year:"2020", title:"First Commercial Crewed Flight", text:"SpaceX Crew Dragon sends NASA astronauts to the ISS."}
+];
+function showTimeline(index) {
+  const ev = timelineData[index];
+  const modal = document.getElementById('info-modal');
+  document.getElementById('modal-title').textContent = `${ev.year} — ${ev.title}`;
+  document.getElementById('modal-demo').textContent = '🚀';
+  document.getElementById('modal-demo').style.color = '#ffd700';
+  document.getElementById('modal-text').innerHTML = ev.text;
+  modal.style.display = 'flex';
+}
+
+// ─── Lightbox & Modal ──────────────────────────────────────────
+const galleryImages = Array.from(document.querySelectorAll('.gallery img')).map(img => img.src);
+let currentIndex = 0;
+function openLightbox(index) {
+  currentIndex = index;
+  document.getElementById('lightbox-img').src = galleryImages[currentIndex];
+  document.getElementById('lightbox').style.display = 'flex';
+}
+function closeLightbox() { document.getElementById('lightbox').style.display = 'none'; }
+function changeImage(delta) {
+  currentIndex = (currentIndex + delta + galleryImages.length) % galleryImages.length;
+  document.getElementById('lightbox-img').src = galleryImages[currentIndex];
+}
+document.getElementById('lightbox').addEventListener('click', e => { if (e.target.id === 'lightbox') closeLightbox(); });
+document.querySelectorAll('.gallery img').forEach((img, i) => img.addEventListener('click', () => openLightbox(i)));
+
+function closeInfoModal() {
+  document.getElementById('info-modal').style.display = 'none';
+}
+document.getElementById('info-modal').addEventListener('click', e => { if (e.target.id === 'info-modal') closeInfoModal(); });
+
+// ─── Home Navigation ───────────────────────────────────────────
+function navigateTo(section) {
+  document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+  const navLink = document.querySelector(`a[href="#${section}"]`);
+  if (navLink) navLink.classList.add('active');
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(section).classList.add('active');
+
+  const m = document.createElement('div');
+  m.className = 'meteor';
+  m.style.animationDuration = '0.9s';
+  m.style.left = Math.random() * 90 + 5 + '%';
+  document.getElementById('space').appendChild(m);
+  setTimeout(() => m.remove(), 1200);
+}
+
+// ─── START ─────────────────────────────────────────────────────
+initStarClassifier();
+initBgStars();
+redrawCanvas();
+initGalaxySim();
+drawSolarSystem();
+updateScore();
+
+document.addEventListener('keydown', e => {
+  if (e.key.toLowerCase() === 'c' && document.getElementById('constellations').classList.contains('active')) randomConstellation();
+});
+</script>
+</body>
+</html>
